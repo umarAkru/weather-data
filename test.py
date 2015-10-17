@@ -2,7 +2,6 @@
 #Python Weather Assignment
 #Prepared at: 10/13/2015
 
-
 def showAnnualReport():
     files_96 = list()
     files_97 = list()
