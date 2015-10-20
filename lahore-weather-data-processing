@@ -1,0 +1,94 @@
+import glob
+import os
+
+
+def yearly_report_of_hottest_day(year_of_file):
+    max_temp = max(maximum_temperature)
+    index = maximum_temperature.index(max_temp)
+    date = dates[index]
+    print(year_of_file,"\t",date,"\t",max_temp)
+    
+
+
+def msgs():
+    msgs = []
+    msgs.append("Press 1 for Annual Reports")  
+    msgs.append("Press 2 for Hottest Days of each Year")
+        
+    for msg in msgs:
+        print(msg)
+    
+    return int(input())
+
+
+def yearlyreport(year_of_file):
+    print(year_of_file,"\t",max(maximum_temperature),"\t\t",max(maximum_humidity),"\t\t",min(minimum_humidity),'\t\t',min(minimum_temperature))
+
+
+def Yearly_Temperature():
+
+    os.chdir('C:\\eclipse\\test\\weatherdata')
+    weather_data_files = glob.glob('*.txt')
+
+    year_of_file = weather_data_files[0].split('_')[2]
+    print("Year\tMax-Temp\tMax-Humidity\tMin-Humidity\tMin_Temp")
+    
+    for file in weather_data_files:
+        if year_of_file != file.split('_')[2]:
+            yearlyreport(year_of_file)
+            year_of_file = file.split('_')[2]
+            maximum_temperature.clear()
+            minimum_humidity.clear()
+            maximum_humidity.clear()
+            minimum_temperature.clear()     
+            
+        with open(file) as file:
+            for line in file:
+                wordlist = line.split(',')
+                try:
+                    maximum_temperature.append(int(wordlist[1]))
+                    minimum_temperature.append(int(wordlist[3]))
+                    maximum_humidity.append(int(wordlist[7]))
+                    minimum_humidity.append(int(wordlist[9]))
+                    
+                except:
+                    pass
+    yearlyreport(year_of_file)
+            
+
+
+def Hottest_Day():
+    os.chdir('C:\\eclipse\\test\\weatherdata')
+    weather_data_files = glob.glob('*.txt')
+
+    year_of_file = weather_data_files[0].split('_')[2]
+
+    for file in weather_data_files:
+        if year_of_file != file.split('_')[2]:
+            yearly_report_of_hottest_day(year_of_file)
+            year_of_file = file.split('_')[2]
+            maximum_temperature.clear()
+            dates.clear()
+        with open(file) as file:
+            for line in file:
+                wordlist = line.split(',')
+                try:
+                    maximum_temperature.append(int(wordlist[1]))
+                    dates.append(wordlist[0])
+                
+                except:
+                    pass
+    yearly_report_of_hottest_day(year_of_file)
+            
+            
+
+maximum_temperature = []
+minimum_temperature = []
+maximum_humidity = []
+minimum_humidity = []
+dates = []
+
+if msgs() == 1:
+    Yearly_Temperature()
+else:
+    Hottest_Day()
