@@ -1,0 +1,108 @@
+import os,glob,csv
+def msgs():
+    msgs = []
+    msgs.append("Press 1 for Annual Reports")  
+    msgs.append("Press 2 for Hottest Days of each Year")
+        
+    for msg in msgs:
+        print(msg)
+    
+    return int(input())
+
+
+def Yearly_Temperature():
+    maximum_temperature = []
+    minimum_temperature = []
+    maximum_humidity = []
+    minimum_humidity = []
+    yearly_maximum_temperature = dict()
+    yearly_minimum_temperature = dict()
+    yearly_maximum_humidity = dict()
+    yearly_minimum_humidity = dict()        
+            
+    os.chdir('C:\\eclipse\\test\\weatherdata')
+    weather_data_files = glob.glob('*.txt')
+    year_of_file = weather_data_files[0].split('_')[2]
+    print("Year\tMax-Temp\tMax-Humidity\tMin-Humidity\tMin_Temp")
+    
+    for file in weather_data_files:
+        extracted_file_year = file.split('_')[2] 
+        if year_of_file != extracted_file_year:
+            yearly_maximum_temperature[year_of_file] = max(maximum_temperature)
+            yearly_minimum_temperature[year_of_file] = min(minimum_temperature)
+            yearly_maximum_humidity[year_of_file] = max(maximum_humidity)
+            yearly_minimum_humidity[year_of_file] = min(minimum_humidity)
+            
+            year_of_file = extracted_file_year
+            maximum_temperature.clear()
+            minimum_temperature.clear()
+            minimum_humidity.clear()
+            maximum_humidity.clear()
+
+        with open(file) as f:
+            reader = csv.reader(f,delimiter=',')
+            for row in reader:
+                try:
+                    maximum_temperature.append(int(row[1]))
+                    minimum_temperature.append(int(row[3]))
+                    maximum_humidity.append(int(row[7]))
+                    minimum_humidity.append(int(row[9]))
+                        
+                except:
+                    pass
+   
+    yearly_maximum_temperature[year_of_file] = max(maximum_temperature)
+    yearly_minimum_temperature[year_of_file] = min(minimum_temperature)
+    yearly_maximum_humidity[year_of_file] = max(maximum_humidity)
+    yearly_minimum_humidity[year_of_file] = min(minimum_humidity)
+            
+    for key in sorted(yearly_maximum_humidity):
+        print( key,"\t",yearly_maximum_temperature[key],"\t\t",yearly_maximum_humidity[key],"\t\t",yearly_minimum_humidity[key],"\t\t",yearly_minimum_temperature[key] )        
+    
+def Hottest_Day():
+    maximum_temperature = []
+    dates = []
+    hottest_day = dict()
+    
+    os.chdir('C:\\eclipse\\test\\weatherdata')
+    weather_data_files = glob.glob('*.txt')
+    
+    year_of_file = weather_data_files[0].split('_')[2]
+    
+    print("Year\tDate\t\tMax-Temp")
+    
+    for file in weather_data_files:
+        extracted_file_year = file.split('_')[2]
+        if year_of_file != extracted_file_year:
+            max_temp = max(maximum_temperature)
+            index = maximum_temperature.index(max_temp)
+            date = dates[index]
+            hottest_day[date] = max_temp 
+            year_of_file = extracted_file_year
+            maximum_temperature.clear()
+            dates.clear()
+
+        with open(file) as f:
+            reader = csv.reader(f,delimiter=',')
+            for row in reader:
+                try:
+                    maximum_temperature.append(int(row[1]))   
+                    dates.append(row[0])                     
+                except:
+                    pass
+    
+    max_temp = max(maximum_temperature)
+    index = maximum_temperature.index(max_temp)
+    date = dates[index]
+    hottest_day[date] = max_temp 
+
+    for key in sorted(hottest_day):
+        print( key.split('-')[0],"\t",key,"\t",hottest_day[key] )        
+    
+
+def main():
+    if msgs() == 1:
+        Yearly_Temperature()    
+    else:
+        Hottest_Day()
+main()
