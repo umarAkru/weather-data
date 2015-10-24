@@ -1,0 +1,131 @@
+import os,glob,csv
+import sys
+
+def application_usage_info():
+    print("Usage: weather [report#] [data_dir]")
+    print("")
+    print("[Report #]")
+    print("1 for Annual Max/Min Temperature")
+    print("2 for Hottest day of each year")
+    print("")
+    print("[data_dir]")
+    print("Directory containing weather data files")
+
+
+def msgs():
+    options = []
+    options.append("Press 1 for Annual Reports")  
+    options.append("Press 2 for Hottest Days of each Year")
+        
+    for option in options:
+        print(option)
+    
+def yearly_temperature(path):
+    maximum_temperature = []
+    minimum_temperature = []
+    maximum_humidity = []
+    minimum_humidity = []
+    yearly_maximum_temperature = dict()
+    yearly_minimum_temperature = dict()
+    yearly_maximum_humidity = dict()
+    yearly_minimum_humidity = dict()        
+            
+    os.chdir(path)
+    weather_data_files = glob.glob('*.txt')
+    year_of_file = weather_data_files[0].split('_')[2]
+    print("Year\tMax-Temp\tMax-Humidity\tMin-Humidity\tMin_Temp")
+    
+    for file in weather_data_files:
+        extracted_file_year = file.split('_')[2] 
+        if year_of_file != extracted_file_year:
+            yearly_maximum_temperature[year_of_file] = max(maximum_temperature)
+            yearly_minimum_temperature[year_of_file] = min(minimum_temperature)
+            yearly_maximum_humidity[year_of_file] = max(maximum_humidity)
+            yearly_minimum_humidity[year_of_file] = min(minimum_humidity)
+            
+            year_of_file = extracted_file_year
+            maximum_temperature.clear()
+            minimum_temperature.clear()
+            minimum_humidity.clear()
+            maximum_humidity.clear()
+
+        with open(file) as f:
+            reader = csv.reader(f,delimiter=',')
+            for row in reader:
+                try:
+                    maximum_temperature.append(int(row[1]))
+                    minimum_temperature.append(int(row[3]))
+                    maximum_humidity.append(int(row[7]))
+                    minimum_humidity.append(int(row[9]))
+                except IndexError:
+                    pass
+                except ValueError:
+                    pass    
+                    
+   
+    yearly_maximum_temperature[year_of_file] = max(maximum_temperature)
+    yearly_minimum_temperature[year_of_file] = min(minimum_temperature)
+    yearly_maximum_humidity[year_of_file] = max(maximum_humidity)
+    yearly_minimum_humidity[year_of_file] = min(minimum_humidity)
+            
+    for key in sorted(yearly_maximum_humidity):
+        print( key,"\t",yearly_maximum_temperature[key],"\t\t",yearly_maximum_humidity[key],"\t\t",yearly_minimum_humidity[key],"\t\t",yearly_minimum_temperature[key] )        
+    
+def hottest_day(path):
+    maximum_temperature = []
+    dates = []
+    hottest_day = dict()
+    
+    os.chdir(path)
+    weather_data_files = glob.glob('*.txt')
+    
+    year_of_file = weather_data_files[0].split('_')[2]
+    
+    print("Year\tDate\t\tMax-Temp")
+    
+    for file in weather_data_files:
+        extracted_file_year = file.split('_')[2]
+        if year_of_file != extracted_file_year:
+            max_temp = max(maximum_temperature)
+            index = maximum_temperature.index(max_temp)
+            date = dates[index]
+            hottest_day[date] = max_temp 
+            year_of_file = extracted_file_year
+            maximum_temperature.clear()
+            dates.clear()
+
+        with open(file) as f:
+            reader = csv.reader(f,delimiter=',')
+            for row in reader:
+                try:
+                    maximum_temperature.append(int(row[1]))   
+                    dates.append(row[0])                     
+                except IndexError:
+                    pass
+                except ValueError:
+                    pass
+    
+    max_temp = max(maximum_temperature)
+    index = maximum_temperature.index(max_temp)
+    date = dates[index]
+    hottest_day[date] = max_temp 
+
+    for key in sorted(hottest_day):
+        print( key.split('-')[0],"\t",key,"\t",hottest_day[key] )        
+    
+
+def main():
+    if len(sys.argv) > 1:
+        selection = sys.argv[1]
+        data_directory = sys.argv[2]
+        path = 'C:\\eclipse\\test\\' + data_directory
+        if selection == '1':
+            yearly_temperature(path)
+    
+        elif selection == '2':
+            hottest_day(path)
+        else:
+            print("Provide Selection Argument either 1 or 2 ")
+    else:
+        application_usage_info()
+if __name__ == "__main__":main()
